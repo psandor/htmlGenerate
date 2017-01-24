@@ -10,14 +10,15 @@ f.on('end', function() {
     fs.readdir('./data/', (err, files) => {
         files.forEach(file => {
             var filename = file.replace(/.*\\|\..*$/g, '');
-            generateHtml(file, filename);
+
+            generateHtml("./data/" + file, filename);
         });
     })
 });
 
 function generateHtml(file, filename) {
     var inputdata = {};
-    fs.createReadStream("./data/en.csv")
+    fs.createReadStream(file)
         .pipe(parse({
             delimiter: ';'
         }))
@@ -26,15 +27,15 @@ function generateHtml(file, filename) {
         })
         .on('end', function() {
             //do something wiht csvData
-            parseHtml(inputdata);
+            parseHtml(inputdata, filename);
         });
 }
 
-function parseHtml(inputdata) {
+function parseHtml(inputdata, filename) {
     tmp = template.replace(/\<%=(.*?)\%>/g, function(match, property) {
         return inputdata[property];
     });
-    fs.open('./new/en.html', 'w+', function(err, data) {
+    fs.open('./new/' + filename + '.html', 'w+', function(err, data) {
         if (err) {
             console.log("ERROR !! " + err);
         } else {
